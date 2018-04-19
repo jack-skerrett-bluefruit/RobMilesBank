@@ -89,13 +89,15 @@ namespace AccountManagement
             return userValue;
 
         }
-        public static string ValidateName(string name)
+        public static string ValidateName(string prompt)
         {
-            string trimmedName = name.Trim();
+            string trimmedName;
             while (true)
             {
-
-                if (name == null)
+                Console.WriteLine("\n" + prompt);
+                string inName = Console.ReadLine();
+                trimmedName = inName.Trim();
+                if (trimmedName == null)
                 {
                     Console.WriteLine("\nYou have entered a null value, please enter another name.");
                     continue;
@@ -104,18 +106,14 @@ namespace AccountManagement
                 {
                     Console.WriteLine("\nYou didn't enter any text, please enter a name");
                     continue;
-                }
+                };              
                 break;
             }
+            return trimmedName;
 
-            return name;
         }
         public bool SetName(string inName)
         {
-            string reply;
-            reply = ValidateName(inName);
-            if (reply.Length > 0)
-                return false;
             this.name = inName.Trim();
             return true;
         }

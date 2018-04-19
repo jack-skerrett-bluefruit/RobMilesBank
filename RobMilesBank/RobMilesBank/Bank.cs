@@ -154,19 +154,16 @@ namespace RobMilesBank
         }
         private void CreateCustomerAccount()
         {
-            Console.WriteLine("\nWhat would you like the name on the account to be (this can be edited later)?");
-            string name = CustomerAccount.ValidateName(Console.ReadLine());
+            string name = CustomerAccount.ValidateName("What would you like the name on the account to be?");
             decimal balance = CustomerAccount.ValidateDecimal("How much money would you like initially deposited into the account?", 0, 10000);
             CustomerAccount newAccount = new CustomerAccount(name, balance);
             ourBank.StoreAccount(newAccount);
         }
         private void CreateBabyAccount()
         {
-            Console.WriteLine("\nWhat would you like the name on the account to be (this can be edited later)?");
-            string name = CustomerAccount.ValidateName(Console.ReadLine());
+            string name = CustomerAccount.ValidateName("What would you like the name on the account to be?");
             decimal balance = CustomerAccount.ValidateDecimal("How much money would you like initially deposited into the account?", 0, 1000);
-            Console.WriteLine("What would you like the parent's name on the account to be (this can be edited later)?"); //this cannot be edited later yet
-            string parentName = CustomerAccount.ValidateName(Console.ReadLine());
+            string parentName = CustomerAccount.ValidateName("What would you like the parent name on the account to be?");//need to add a way of editing this later
             BabyAccount newAccount = new BabyAccount(name, balance, parentName);
             ourBank.StoreAccount(newAccount);
         }
@@ -233,16 +230,7 @@ namespace RobMilesBank
         {
             string newName;
             Console.WriteLine("\n-----Name Edit-----");
-            while (true)
-            {
-                Console.WriteLine("Enter new name: ");
-                newName = Console.ReadLine();
-                string reply;
-                reply = CustomerAccount.ValidateName(newName);
-                if (reply.Length == 0)
-                    break;
-                Console.WriteLine("Invalid name: " + reply);
-            }
+            newName = CustomerAccount.ValidateName("What would you like the name on this account to be?");
             account.SetName(newName);
         }
         public void PayInFunds()
