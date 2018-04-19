@@ -25,13 +25,11 @@ namespace RobMilesBank
         {
             if (accountDictionary.ContainsKey(account.GetAccountNumber()) == true)
                 return false;
-
             accountDictionary.Add(account.GetAccountNumber(), account);
             return true;
         }
         public void DeleteAccount(int accountNumber)
         {
-            IAccount accountToDelete = FindAccount(accountNumber);
             try
             {
                 accountDictionary.Remove(accountNumber);
@@ -51,7 +49,6 @@ namespace RobMilesBank
                 account.Save(textOut);
             }
         }
-
         public bool Save(string filename)
         {
             System.IO.TextWriter textOut = null;
@@ -107,7 +104,6 @@ namespace RobMilesBank
             {
                 if (textIn != null) textIn.Close();
             }
-
             return result;
         }
 
@@ -129,6 +125,32 @@ namespace RobMilesBank
             }
         }
     }
+    public class AccountDeleteUI
+    {
+        private DictionaryBank ourBank;
+        public AccountDeleteUI(DictionaryBank inBank)
+        {
+            ourBank = inBank;
+        }
+        public static void DeleteScript(DictionaryBank ourBank)
+        {
+            string ContinueDeleting;
+            int inAccountNumber;
+            do
+            {
+                while (true)
+                {
+                    inAccountNumber = Decimal.ToInt32(CustomerAccount.ValidateDecimal("\nPlease give the account number of the account you want to delete", 100000, 1000000));
+                    string answer = AccountEditUI.ThisOrThat("\nAre you sure you want to delete this account, this cannot be undone. Type [Y] or [N].", "Please give your answer as [Y] or [N]", "y", "n");
+                    if (answer == "n")
+                        break;
+                    ourBank.DeleteAccount(inAccountNumber);
+                    break;
+                }
+                ContinueDeleting = AccountEditUI.ThisOrThat("\nWould you like to delete another account [Y] or [N]?", "Please give your answer as [Y] or [N]", "y", "n");
+            } while (ContinueDeleting == "y");
+        }
+    }
     public class AccountCreateUI
     {
         private DictionaryBank ourBank;
@@ -136,7 +158,7 @@ namespace RobMilesBank
         {
             ourBank = inBank;
         }
-        public static  void CreateScript(DictionaryBank ourBank)
+        public static void CreateScript(DictionaryBank ourBank)
         {
             string continueCreating;
             do
@@ -157,7 +179,7 @@ namespace RobMilesBank
                         break;
                     default:
                         Console.WriteLine("You did not select a baby or customer account.");
-                            break;
+                        break;
                 }
                 continueCreating = AccountEditUI.ThisOrThat("\nWould you like to create an account [Y] or [N]", "You have not entered [Y] or [N]", "y", "n");
             } while (continueCreating == "y");
@@ -194,8 +216,8 @@ namespace RobMilesBank
                 Console.WriteLine("\nEditing account for {0}", account.GetName());
                 Console.WriteLine("    Enter name to edit name");
                 Console.WriteLine("    Enter pay to pay in funds");
-                Console.WriteLine("    Enter draw to draw out funds");
-                Console.WriteLine("    Enter exit to exit editing mode");
+                Console.WriteLine("    Enter draw to withdraw out funds");
+                Console.WriteLine("    Enter exit to stop editing this account");
                 input = TrimLower(Console.ReadLine());
                 switch (input)
                 {
@@ -222,9 +244,9 @@ namespace RobMilesBank
             {
                 while (true)
                 {
-                    int chosenAccountNumber = Decimal.ToInt32(CustomerAccount.ValidateDecimal("\nPlease give the account number of the account you want to edit, or type exit to exit?", 100000, 1000000));
+                    int inAccountNumber = Decimal.ToInt32(CustomerAccount.ValidateDecimal("\nPlease give the account number of the account you want to edit.", 100000, 1000000));
 
-                    chosenAccount = ourBank.FindAccount(chosenAccountNumber);
+                    chosenAccount = ourBank.FindAccount(inAccountNumber);
                     if (chosenAccount == null)
                     {
                         Console.WriteLine("\nThat name does not exist in this bank. Are you sure you have the correct number?");
@@ -265,7 +287,6 @@ namespace RobMilesBank
                 if (account.WithdrawFunds(withdrawValue))
                     break;
             }
-
         }
         public static string ThisOrThat(string prompt, string errorMsg, string answerOne, string answerTwo)
         {
@@ -302,21 +323,19 @@ namespace RobMilesBank
     }
     class BankProgram
     {
-
         public static void Main()
         {
             string input;
             Console.WriteLine("------Welcome to the bank------\n\n\n");
             DictionaryBank ourBank = DictionaryBank.Load("Test.txt");
-
             if (!ourBank.AccountsInBank()) //at the moment, if this tries to load an empty document, it returns a null value and throws an exception that i cant do anything with. Might need to try a "TRYCATCH"  
             {
                 //
             }
             do
             {
-                Console.WriteLine("Would you like to create a new account or edit an existing one?\n" +
-                    "Type new to create an account or type edit to edit an existing account (to exit, type exit).");
+                Console.WriteLine("\nWould you like to create a new account, edit or delete an existing account?\n" +
+                    "Type new to create an account, type edit to edit or delete to delete an existing account (to exit, type exit).");
                 input = AccountEditUI.TrimLower(Console.ReadLine());
                 switch (input)
                 {
@@ -326,38 +345,12 @@ namespace RobMilesBank
                     case "edit":
                         AccountEditUI.EditScript(ourBank);
                         break;
-
+                    case "delete":
+                        AccountDeleteUI.DeleteScript(ourBank);
+                        break;
                 }
             } while (input != "exit");
-
-
-            //CustomerAccount newAccount = new CustomerAccount("Rob", 10000);
-
-            //if (ourBank.StoreAccount(newAccount))
-            //    Console.WriteLine("CustomerAccount added to bank with account number: " + newAccount.GetAccountNumber());
-
-            //BabyAccount newBabyAccount = new BabyAccount("David", 100, "Rob");
-
-            //if (ourBank.StoreAccount(newBabyAccount))
-            //    Console.WriteLine("BabyAccount added to bank with account number: " + newBabyAccount.GetAccountNumber());
-            //Console.WriteLine();
-            ourBank.DeleteAccount(229418);
             ourBank.Save("Test.txt");
-
-
-            //DictionaryBank loadBank = DictionaryBank.Load("Test.txt");
-
-            //IAccount storedAccount = loadBank.FindAccount("David");
-            //if (storedAccount != null)
-            //{
-            //    Console.WriteLine(storedAccount.GetType() + " found in bank");
-            //}
-            //storedAccount = loadBank.FindAccount("Jack");
-            //if (storedAccount != null)
-            //{
-            //    Console.WriteLine(storedAccount.GetType() + " found in bank");
-            //}
-
             Console.ReadLine();
         }
     }
