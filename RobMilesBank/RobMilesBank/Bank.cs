@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AccountManagement;
+using CustomerBanking;
 
 
 namespace RobMilesBank
@@ -29,7 +29,19 @@ namespace RobMilesBank
             accountDictionary.Add(account.GetAccountNumber(), account);
             return true;
         }
+        public void DeleteAccount(int accountNumber)
+        {
+            IAccount accountToDelete = FindAccount(accountNumber);
+            try
+            {
+                accountDictionary.Remove(accountNumber);
+            }
+            catch
+            {
+                Console.WriteLine("Something went wrong");
+            }
 
+        }
         public void Save(System.IO.TextWriter textOut)
         {
             textOut.WriteLine(accountDictionary.Count);
@@ -204,9 +216,8 @@ namespace RobMilesBank
         }
         public static void EditScript(DictionaryBank ourBank)
         {
-            bool x = true;
             IAccount chosenAccount;
-            string continueEditing = "y";
+            string continueEditing;
             do
             {
                 while (true)
@@ -330,7 +341,7 @@ namespace RobMilesBank
             //if (ourBank.StoreAccount(newBabyAccount))
             //    Console.WriteLine("BabyAccount added to bank with account number: " + newBabyAccount.GetAccountNumber());
             //Console.WriteLine();
-
+            ourBank.DeleteAccount(229418);
             ourBank.Save("Test.txt");
 
 
