@@ -67,14 +67,16 @@ namespace AccountManagement
             {
                 //some kind of exception to be thrown about your min and max feels being all kinds of fucked up
             }
-            decimal userValue;
+            string userValue;
+            decimal parsedUserValue;
             while (true)
             {
                 Console.WriteLine(prompt);
                 try
                 {
-                    userValue = decimal.Parse(Console.ReadLine());
-                    if (userValue < min || userValue > max)
+                    userValue = Console.ReadLine();
+                    parsedUserValue = decimal.Parse(userValue);
+                    if (parsedUserValue < min || parsedUserValue > max)
                     {
                         Console.WriteLine("Your value must fall between {0} (min) and {1} (max)", min, max);
                         continue;
@@ -86,7 +88,7 @@ namespace AccountManagement
                     Console.WriteLine("You must enter a numeric value between {0} (min) and {1} (max)", min, max);
                 }
             }
-            return userValue;
+            return parsedUserValue;
 
         }
         public static string ValidateName(string prompt)
@@ -94,7 +96,7 @@ namespace AccountManagement
             string trimmedName;
             while (true)
             {
-                Console.WriteLine("\n" + prompt);
+                Console.WriteLine(prompt);
                 string inName = Console.ReadLine();
                 trimmedName = inName.Trim();
                 if (trimmedName == null)
@@ -106,7 +108,7 @@ namespace AccountManagement
                 {
                     Console.WriteLine("\nYou didn't enter any text, please enter a name");
                     continue;
-                };              
+                };
                 break;
             }
             return trimmedName;

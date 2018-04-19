@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using AccountManagement;
 
 
-
 namespace RobMilesBank
 {
     public class DictionaryBank 
@@ -130,7 +129,7 @@ namespace RobMilesBank
             string continueCreating;
             do
             {
-                Console.WriteLine("What type of account would you like to create?" +
+                Console.WriteLine("\nWhat type of account would you like to create?" +
                     "\n      Type customer for a new customer account" +
                     "\n      Type baby for a new baby account");
                 string input = AccountEditUI.TrimLower(Console.ReadLine());
@@ -154,14 +153,14 @@ namespace RobMilesBank
         }
         private void CreateCustomerAccount()
         {
-            string name = CustomerAccount.ValidateName("What would you like the name on the account to be?");
+            string name = CustomerAccount.ValidateName("\nWhat would you like the name on the account to be?");
             decimal balance = CustomerAccount.ValidateDecimal("How much money would you like initially deposited into the account?", 0, 10000);
             CustomerAccount newAccount = new CustomerAccount(name, balance);
             ourBank.StoreAccount(newAccount);
         }
         private void CreateBabyAccount()
         {
-            string name = CustomerAccount.ValidateName("What would you like the name on the account to be?");
+            string name = CustomerAccount.ValidateName("\nWhat would you like the name on the account to be?");
             decimal balance = CustomerAccount.ValidateDecimal("How much money would you like initially deposited into the account?", 0, 1000);
             string parentName = CustomerAccount.ValidateName("What would you like the parent name on the account to be?");//need to add a way of editing this later
             BabyAccount newAccount = new BabyAccount(name, balance, parentName);
@@ -205,26 +204,27 @@ namespace RobMilesBank
         }
         public static void EditScript(DictionaryBank ourBank)
         {
+            bool x = true;
             IAccount chosenAccount;
-            string continueEditing;
+            string continueEditing = "y";
             do
             {
                 while (true)
                 {
-                    int chosenAccountNumber = Decimal.ToInt32(CustomerAccount.ValidateDecimal("\nWhich account would you like to edit (please give the account number)?", 100000, 1000000));
+                    int chosenAccountNumber = Decimal.ToInt32(CustomerAccount.ValidateDecimal("\nPlease give the account number of the account you want to edit, or type exit to exit?", 100000, 1000000));
+
                     chosenAccount = ourBank.FindAccount(chosenAccountNumber);
                     if (chosenAccount == null)
                     {
-                        Console.WriteLine("\nThat name does not exist in this bank. Are you sure you spelt the name correctly?");
+                        Console.WriteLine("\nThat name does not exist in this bank. Are you sure you have the correct number?");
                         continue;
                     }
                     break;
                 }
-
                 AccountEditUI edit = new AccountEditUI(chosenAccount);
                 edit.DoEdit(chosenAccount);
-                continueEditing = ThisOrThat("\nWould you like to continue editing [Y] or [N]? ", "You have not entered [Y] or [N].", "y", "n");
-            } while (continueEditing == "Y");
+                continueEditing = ThisOrThat("\nWould you like to edit another account [Y] or [N]? ", "You have not entered [Y] or [N].", "y", "n");
+            } while (continueEditing == "y");
         }
         public void EditName()
         {
