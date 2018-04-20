@@ -213,7 +213,12 @@ namespace CustomerBanking
             string balanceText = textIn.ReadLine();
             balance = decimal.Parse(balanceText);
         }
-
+        public override string ToString()
+        {
+            return "\nThe account number is " + accountNumber +
+                "\nThe account holders name is " + name +
+                "\nThe balance of this account is " + balance;
+        }
     }
 
     public class BabyAccount : CustomerAccount
@@ -253,6 +258,11 @@ namespace CustomerBanking
             base(textIn)
         {
             parentName = textIn.ReadLine();
+        }
+        public override string ToString()
+        {
+            return base.ToString() +
+                "\nThe parent name attached to this account is " + parentName;
         }
     }
 }

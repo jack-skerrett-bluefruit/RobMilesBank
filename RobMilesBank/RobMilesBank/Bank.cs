@@ -38,7 +38,6 @@ namespace RobMilesBank
             {
                 Console.WriteLine("Something went wrong");
             }
-
         }
         public void Save(System.IO.TextWriter textOut)
         {
@@ -70,7 +69,6 @@ namespace RobMilesBank
             }
             return true;
         }
-
         public static DictionaryBank Load(System.IO.TextReader textIn)
         {
             DictionaryBank result = new DictionaryBank();
@@ -86,7 +84,6 @@ namespace RobMilesBank
             }
             return result;
         }
-
         public static DictionaryBank Load(string filename)
         {
             System.IO.TextReader textIn = null;
@@ -106,23 +103,36 @@ namespace RobMilesBank
             }
             return result;
         }
-
     }
-
-    class AccountFactory
+    public class AccountStatusUI
     {
-        public static IAccount MakeAccount(
-            string name, System.IO.TextReader textIn)
+        private DictionaryBank ourBank;
+        public AccountStatusUI(DictionaryBank inBank)
         {
-            switch (name)
+            ourBank = inBank;
+        }
+        public static void StatusScript(DictionaryBank ourBank)
+        {
+            string continueStatus;
+            int inAccountNumber;
+            IAccount chosenAccount;
+            do
             {
-                case "CustomerAccount":
-                    return new CustomerAccount(textIn);
-                case "BabyAccount":
-                    return new BabyAccount(textIn);
-                default:
-                    return null;
-            }
+                while (true)
+                {
+                    inAccountNumber = Decimal.ToInt32(CustomerAccount.ValidateDecimal("\nPlease give the account number of the account you want to see: ", 100000, 1000000));
+                    chosenAccount = ourBank.FindAccount(inAccountNumber);
+                    if (chosenAccount == null)
+                    {
+                        Console.WriteLine("\nThere is no account with this account number. Are you sure you typed it correctly?");
+                        continue;
+                    }
+                    break;
+
+                }
+                Console.WriteLine(chosenAccount.ToString());
+                continueStatus = AccountEditUI.ThisOrThat("\nWould you like to the see status of another account [Y] or [N]?", "Please give your answer as [Y] or [N]", "y", "n");
+            } while (continueStatus == "y");
         }
     }
     public class AccountDeleteUI
@@ -134,7 +144,7 @@ namespace RobMilesBank
         }
         public static void DeleteScript(DictionaryBank ourBank)
         {
-            string ContinueDeleting;
+            string continueDeleting;
             int inAccountNumber;
             do
             {
@@ -147,8 +157,8 @@ namespace RobMilesBank
                     ourBank.DeleteAccount(inAccountNumber);
                     break;
                 }
-                ContinueDeleting = AccountEditUI.ThisOrThat("\nWould you like to delete another account [Y] or [N]?", "Please give your answer as [Y] or [N]", "y", "n");
-            } while (ContinueDeleting == "y");
+                continueDeleting = AccountEditUI.ThisOrThat("\nWould you like to delete another account [Y] or [N]?", "Please give your answer as [Y] or [N]", "y", "n");
+            } while (continueDeleting == "y");
         }
     }
     public class AccountCreateUI
@@ -183,13 +193,13 @@ namespace RobMilesBank
                 }
                 continueCreating = AccountEditUI.ThisOrThat("\nWould you like to create an account [Y] or [N]", "You have not entered [Y] or [N]", "y", "n");
             } while (continueCreating == "y");
-
         }
         private void CreateCustomerAccount()
         {
             string name = CustomerAccount.ValidateName("\nWhat would you like the name on the account to be?");
             decimal balance = CustomerAccount.ValidateDecimal("How much money would you like initially deposited into the account?", 0, 10000);
             CustomerAccount newAccount = new CustomerAccount(name, balance);
+            Console.WriteLine("Account summary: \n" + newAccount.ToString());
             ourBank.StoreAccount(newAccount);
         }
         private void CreateBabyAccount()
@@ -198,6 +208,7 @@ namespace RobMilesBank
             decimal balance = CustomerAccount.ValidateDecimal("How much money would you like initially deposited into the account?", 0, 1000);
             string parentName = CustomerAccount.ValidateName("What would you like the parent name on the account to be?");//need to add a way of editing this later
             BabyAccount newAccount = new BabyAccount(name, balance, parentName);
+            Console.WriteLine("Account summary: \n" + newAccount.ToString());
             ourBank.StoreAccount(newAccount);
         }
     }
@@ -314,6 +325,22 @@ namespace RobMilesBank
             return toFormat;
         }
     }
+    class AccountFactory
+    {
+        public static IAccount MakeAccount(
+            string name, System.IO.TextReader textIn)
+        {
+            switch (name)
+            {
+                case "CustomerAccount":
+                    return new CustomerAccount(textIn);
+                case "BabyAccount":
+                    return new BabyAccount(textIn);
+                default:
+                    return null;
+            }
+        }
+    }
     public class BankException : Exception
     {
         public BankException(String message) :
@@ -325,6 +352,7 @@ namespace RobMilesBank
     {
         public static void Main()
         {
+
             string input;
             Console.WriteLine("------Welcome to the bank------\n\n\n");
             DictionaryBank ourBank = DictionaryBank.Load("Test.txt");
@@ -334,8 +362,12 @@ namespace RobMilesBank
             }
             do
             {
-                Console.WriteLine("\nWould you like to create a new account, edit or delete an existing account?\n" +
-                    "Type new to create an account, type edit to edit or delete to delete an existing account (to exit, type exit).");
+                Console.WriteLine("\nWould you like to:" +
+                    "\n    Create a new account (type new)" +
+                    "\n    Edit an existing account (type edit)" +
+                    "\n    See the status of an exisiting account (type status)" +
+                    "\n    Delete an existing account (type delete)" +
+                    "\n    Or type exit to exit the program");
                 input = AccountEditUI.TrimLower(Console.ReadLine());
                 switch (input)
                 {
@@ -344,6 +376,9 @@ namespace RobMilesBank
                         break;
                     case "edit":
                         AccountEditUI.EditScript(ourBank);
+                        break;
+                    case "status":
+                        AccountStatusUI.StatusScript(ourBank);
                         break;
                     case "delete":
                         AccountDeleteUI.DeleteScript(ourBank);
