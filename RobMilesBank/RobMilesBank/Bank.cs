@@ -236,8 +236,8 @@ namespace RobMilesBank
                 Console.WriteLine("\n-----Account Editing-----\n" +
                     "\nEditing account for {0}", account.GetName());
                 Console.WriteLine("    Enter name to edit name");
-                Console.WriteLine("    Enter pay to pay in funds");
-                Console.WriteLine("    Enter draw to withdraw out funds");
+                Console.WriteLine("    Enter pay to deposit funds");
+                Console.WriteLine("    Enter draw to withdraw funds");
                 Console.WriteLine("    Enter exit to stop editing this account");
                 input = Validation.TrimLower(Console.ReadLine());
                 switch (input)
@@ -265,7 +265,7 @@ namespace RobMilesBank
             {
                 while (true)
                 {
-                    int inAccountNumber = Validation.ValidateInt("\nPlease give the account number of the account you want to edit. If you don't want to edit an account, type exit.", 0, 999999);
+                    int inAccountNumber = Validation.ValidateInt("\nPlease give the account number of the account you want to edit. If you don't want to edit an account, type exit.", 000000, 999999);
                     if (inAccountNumber == -1)
                     { 
                         return;
@@ -307,7 +307,7 @@ namespace RobMilesBank
             Console.WriteLine("\n-----Withdraw Funds-----");
             while (true)
             {
-                withdrawValue = Validation.ValidateDecimal("Enter how much money you would like to withdraw: ", 0, 10000);
+                withdrawValue = Validation.ValidateDecimal("Enter how much money you would like to withdraw: ", 0, 1000);
                 if (account.WithdrawFunds(withdrawValue))
                     break;
                 else
