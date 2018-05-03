@@ -36,7 +36,7 @@ namespace RobMilesBank
             }
             catch
             {
-                Console.WriteLine("Something went wrong");
+                Console.WriteLine("Something went wrong. Whoops.");
             }
         }
         public void Save(System.IO.TextWriter textOut)
@@ -120,7 +120,10 @@ namespace RobMilesBank
             {
                 while (true)
                 {
-                    inAccountNumber = Decimal.ToInt32(CustomerAccount.ValidateDecimal("\nPlease give the account number of the account you want to see: ", 100000, 1000000));
+                    inAccountNumber = Validation.ValidateInt("\n-----Account Status-----\n" +
+                        "\nPlease give the account number of the account you want to see. If you don't want to see the status of an account, type exit.", 0, 1000000);
+                    if (inAccountNumber == -1)
+                        return;
                     chosenAccount = ourBank.FindAccount(inAccountNumber);
                     if (chosenAccount == null)
                     {
@@ -131,7 +134,7 @@ namespace RobMilesBank
 
                 }
                 Console.WriteLine(chosenAccount.ToString());
-                continueStatus = AccountEditUI.ThisOrThat("\nWould you like to the see status of another account [Y] or [N]?", "Please give your answer as [Y] or [N]", "y", "n");
+                continueStatus = Validation.ThisOrThat("\nWould you like to the see status of another account [Y] or [N]?", "Please give your answer as [Y] or [N]", "y", "n");
             } while (continueStatus == "y");
         }
     }
@@ -150,14 +153,17 @@ namespace RobMilesBank
             {
                 while (true)
                 {
-                    inAccountNumber = Decimal.ToInt32(CustomerAccount.ValidateDecimal("\nPlease give the account number of the account you want to delete", 100000, 1000000));
-                    string answer = AccountEditUI.ThisOrThat("\nAre you sure you want to delete this account, this cannot be undone. Type [Y] or [N].", "Please give your answer as [Y] or [N]", "y", "n");
+                    inAccountNumber = Validation.ValidateInt("\n-----Account Deletion-----\n" +
+                        "\nPlease give the account number of the account you want to delete. If you don't want to delete an account, type exit.", 0, 1000000);
+                    if (inAccountNumber == -1)
+                        return;
+                    string answer = Validation.ThisOrThat("\nAre you sure you want to delete this account, this cannot be undone. Type [Y] or [N].", "Please give your answer as [Y] or [N]", "y", "n");
                     if (answer == "n")
                         break;
                     ourBank.DeleteAccount(inAccountNumber);
                     break;
                 }
-                continueDeleting = AccountEditUI.ThisOrThat("\nWould you like to delete another account [Y] or [N]?", "Please give your answer as [Y] or [N]", "y", "n");
+                continueDeleting = Validation.ThisOrThat("\nWould you like to delete another account [Y] or [N]?", "Please give your answer as [Y] or [N]", "y", "n");
             } while (continueDeleting == "y");
         }
     }
@@ -173,10 +179,11 @@ namespace RobMilesBank
             string continueCreating;
             do
             {
-                Console.WriteLine("\nWhat type of account would you like to create?" +
+                Console.WriteLine("\n-----Account Creation-----\n" +
+                    "\nWhat type of account would you like to create?" +
                     "\n      Type customer for a new customer account" +
                     "\n      Type baby for a new baby account");
-                string input = AccountEditUI.TrimLower(Console.ReadLine());
+                string input = Validation.TrimLower(Console.ReadLine());
                 switch (input)
                 {
                     case "customer":
@@ -188,27 +195,27 @@ namespace RobMilesBank
                         create.CreateBabyAccount();
                         break;
                     default:
-                        Console.WriteLine("You did not select a baby or customer account.");
+                        Console.WriteLine("You did not select a baby or customer account");
                         break;
                 }
-                continueCreating = AccountEditUI.ThisOrThat("\nWould you like to create an account [Y] or [N]", "You have not entered [Y] or [N]", "y", "n");
+                continueCreating = Validation.ThisOrThat("\nWould you like to create another account [Y] or [N]?", "You have not entered [Y] or [N]", "y", "n");
             } while (continueCreating == "y");
         }
         private void CreateCustomerAccount()
         {
-            string name = CustomerAccount.ValidateName("\nWhat would you like the name on the account to be?");
-            decimal balance = CustomerAccount.ValidateDecimal("How much money would you like initially deposited into the account?", 0, 10000);
+            string name = Validation.ValidateName("\nWhat would you like the name on the account to be?");
+            decimal balance = Validation.ValidateDecimal("How much money would you like initially deposited into the account?", 0, 10000);
             CustomerAccount newAccount = new CustomerAccount(name, balance);
-            Console.WriteLine("Account summary: \n" + newAccount.ToString());
+            Console.WriteLine("\nAccount summary: \n" + newAccount.ToString());
             ourBank.StoreAccount(newAccount);
         }
         private void CreateBabyAccount()
         {
-            string name = CustomerAccount.ValidateName("\nWhat would you like the name on the account to be?");
-            decimal balance = CustomerAccount.ValidateDecimal("How much money would you like initially deposited into the account?", 0, 1000);
-            string parentName = CustomerAccount.ValidateName("What would you like the parent name on the account to be?");//need to add a way of editing this later
+            string name = Validation.ValidateName("\nWhat would you like the name on the account to be?");
+            decimal balance = Validation.ValidateDecimal("How much money would you like initially deposited into the account?", 0, 10000);
+            string parentName = Validation.ValidateName("What would you like the parent name on the account to be?");
             BabyAccount newAccount = new BabyAccount(name, balance, parentName);
-            Console.WriteLine("Account summary: \n" + newAccount.ToString());
+            Console.WriteLine("\nAccount summary: \n" + newAccount.ToString());
             ourBank.StoreAccount(newAccount);
         }
     }
@@ -219,17 +226,20 @@ namespace RobMilesBank
         {
             account = inaccount;
         }
-        public void DoEdit(IAccount account)// need to be careful with this because at the minute I can accept a babyaccount to edit but there is no option to edit the baby account specific things (parent name)
+        public void DoEdit(IAccount account)
         {
+            //do a check to see if account is babyaccount, then use AS keyword to cast it to a babyaccount
+            //if(account is BabyAccount){var babyAccount = account as BabyAccount)}}
             string input;
             do
             {
-                Console.WriteLine("\nEditing account for {0}", account.GetName());
+                Console.WriteLine("\n-----Account Editing-----\n" +
+                    "\nEditing account for {0}", account.GetName());
                 Console.WriteLine("    Enter name to edit name");
                 Console.WriteLine("    Enter pay to pay in funds");
                 Console.WriteLine("    Enter draw to withdraw out funds");
                 Console.WriteLine("    Enter exit to stop editing this account");
-                input = TrimLower(Console.ReadLine());
+                input = Validation.TrimLower(Console.ReadLine());
                 switch (input)
                 {
                     case "name":
@@ -255,26 +265,29 @@ namespace RobMilesBank
             {
                 while (true)
                 {
-                    int inAccountNumber = Decimal.ToInt32(CustomerAccount.ValidateDecimal("\nPlease give the account number of the account you want to edit.", 100000, 1000000));
-
+                    int inAccountNumber = Validation.ValidateInt("\nPlease give the account number of the account you want to edit. If you don't want to edit an account, type exit.", 0, 999999);
+                    if (inAccountNumber == -1)
+                    { 
+                        return;
+                    }
                     chosenAccount = ourBank.FindAccount(inAccountNumber);
                     if (chosenAccount == null)
-                    {
-                        Console.WriteLine("\nThat name does not exist in this bank. Are you sure you have the correct number?");
-                        continue;
-                    }
+                        Console.WriteLine("\nThat account number does not exist in this bank");
                     break;
                 }
-                AccountEditUI edit = new AccountEditUI(chosenAccount);
-                edit.DoEdit(chosenAccount);
-                continueEditing = ThisOrThat("\nWould you like to edit another account [Y] or [N]? ", "You have not entered [Y] or [N].", "y", "n");
+                if (chosenAccount != null)
+                {
+                    AccountEditUI edit = new AccountEditUI(chosenAccount);
+                    edit.DoEdit(chosenAccount);
+                }
+                continueEditing = Validation.ThisOrThat("\nWould you like to edit another account [Y] or [N]? ", "You have not entered [Y] or [N].", "y", "n");
             } while (continueEditing == "y");
         }
         public void EditName()
         {
             string newName;
             Console.WriteLine("\n-----Name Edit-----");
-            newName = CustomerAccount.ValidateName("What would you like the name on this account to be?");
+            newName = Validation.ValidateName("What would you like the name on this account to be?");
             account.SetName(newName);
         }
         public void PayInFunds()
@@ -283,7 +296,7 @@ namespace RobMilesBank
             Console.WriteLine("\n-----Deposit Funds-----");
             while (true)
             {
-                depositValue = CustomerAccount.ValidateDecimal("Enter how much money you would like to deposit: ", 0, 10000);
+                depositValue = Validation.ValidateDecimal("Enter how much money you would like to deposit: ", 0, 10000);
                 account.PayInFunds(depositValue);
                 break;
             }
@@ -294,36 +307,21 @@ namespace RobMilesBank
             Console.WriteLine("\n-----Withdraw Funds-----");
             while (true)
             {
-                withdrawValue = CustomerAccount.ValidateDecimal("Enter how much money you would like to withdraw: ", 0, 1000);
+                withdrawValue = Validation.ValidateDecimal("Enter how much money you would like to withdraw: ", 0, 10000);
                 if (account.WithdrawFunds(withdrawValue))
                     break;
+                else
+                    Console.WriteLine("\nThat is more money than you have in the account.\n");
             }
         }
-        public static string ThisOrThat(string prompt, string errorMsg, string answerOne, string answerTwo)
-        {
-            if (answerOne == answerTwo)
-            {
-                //throw an exception that says your two answers are the same
-            }
-            string answer;
-            while (true)
-            {
-                Console.WriteLine(prompt);
-                answer = AccountEditUI.TrimLower(Console.ReadLine());
-                if (answer != answerOne && answer != answerTwo)
-                {
-                    Console.WriteLine(errorMsg);
-                    continue;
-                }
-                return answer;
-            }
-        }
-        public static string TrimLower(string toFormat)
-        {
-            toFormat = toFormat.Trim();
-            toFormat = toFormat.ToLower();
-            return toFormat;
-        }
+        //public void EditParentName()
+        //{
+        //    string newParentName;
+        //    Console.WriteLine("\n-----Parent Name Edit-----");
+        //    newParentName = Validation.ValidateName("What would you like the parent name on this account to be?");
+        //    account.SetParentName(newParentName);
+        //}
+
     }
     class AccountFactory
     {
@@ -341,35 +339,142 @@ namespace RobMilesBank
             }
         }
     }
-    public class BankException : Exception
+    class Validation
     {
-        public BankException(String message) :
-            base(message)
+        public static string ValidateName(string prompt)
         {
+            string trimmedName;
+            while (true)
+            {
+                Console.WriteLine(prompt);
+                string inName = Console.ReadLine();
+                trimmedName = inName.Trim();
+                if (trimmedName == null)
+                {
+                    Console.WriteLine("\nYou have entered a null value, please enter another name.");
+                    continue;
+                }
+                if (trimmedName.Length == 0)
+                {
+                    Console.WriteLine("\nYou didn't enter any text, please enter a name");
+                    continue;
+                };
+                break;
+            }
+            return trimmedName;
+        }
+        public static int ValidateInt(string prompt, int min, int max)
+        {
+            if (min >= max)
+            {
+                //some kind of exception 
+            }
+            string userValue;
+            int parsedUserValue;
+            while(true)
+            {
+                Console.WriteLine(prompt);
+                try
+                {
+                    userValue = Console.ReadLine();
+                    userValue = Validation.TrimLower(userValue);
+                    if (userValue == "exit")
+                        return -1; ;
+                    parsedUserValue = int.Parse(userValue);
+                    if (parsedUserValue < min || parsedUserValue > max)
+                    {
+                        Console.WriteLine("Your value must fall between {0} (min) and {1} (max)", min, max);
+                        continue;
+                    }
+                    break;
+                }
+                catch
+                {
+                    Console.WriteLine("You must enter a numeric value between {0} (min) and {1} (max)", min, max);
+                    continue;
+                }
+            };
+            return parsedUserValue;
+        }
+        public static decimal ValidateDecimal(string prompt, int min, int max)
+        {
+            if (min >= max)
+            {
+                //some kind of exception
+            }
+            string userValue;
+            decimal parsedUserValue;
+            while (true)
+            {
+                Console.WriteLine(prompt);
+                try
+                {
+                    userValue = Console.ReadLine();
+                    parsedUserValue = decimal.Parse(userValue);
+                    if (parsedUserValue < min || parsedUserValue > max)
+                    {
+                        Console.WriteLine("Your value must fall between {0} (min) and {1} (max)", min, max);
+                        continue;
+                    }
+                    break;
+                }
+                catch
+                {
+                    Console.WriteLine("You must enter a numeric value between {0} (min) and {1} (max)", min, max);
+                }
+            }
+            return parsedUserValue;
+        }
+        public static string ThisOrThat(string prompt, string errorMsg, string answerOne, string answerTwo)
+        {
+            if (answerOne == answerTwo)
+            {
+                throw new Exception("The two answers are the same.");
+            }
+            string answer;
+            while (true)
+            {
+                Console.WriteLine(prompt);
+                answer = Validation.TrimLower(Console.ReadLine());
+                if (answer != answerOne && answer != answerTwo)
+                {
+                    Console.WriteLine(errorMsg);
+                    continue;
+                }
+                return answer;
+            }
+        }
+        public static string TrimLower(string toFormat)
+        {
+            toFormat = toFormat.Trim();
+            toFormat = toFormat.ToLower();
+            return toFormat;
         }
     }
     class BankProgram
     {
         public static void Main()
         {
-
-            string input;
-            Console.WriteLine("------Welcome to the bank------\n\n\n");
-            DictionaryBank ourBank = DictionaryBank.Load("Test.txt");
+            Console.WriteLine("\n-------------------------------\n" +
+                "------Welcome to the bank------\n" +
+                "-------------------------------\n\n\n");
+            DictionaryBank ourBank = DictionaryBank.Load("database.txt");
             if (!ourBank.AccountsInBank()) //at the moment, if this tries to load an empty document, it returns a null value and throws an exception that i cant do anything with. Might need to try a "TRYCATCH"  
             {
-                //
+               
             }
+
+            string userValue;
             do
             {
-                Console.WriteLine("\nWould you like to:" +
+                Console.WriteLine("\n-----Feature Select-----\n" +
                     "\n    Create a new account (type new)" +
                     "\n    Edit an existing account (type edit)" +
-                    "\n    See the status of an exisiting account (type status)" +
+                    "\n    See the status of an existing account (type status)" +
                     "\n    Delete an existing account (type delete)" +
                     "\n    Or type exit to exit the program");
-                input = AccountEditUI.TrimLower(Console.ReadLine());
-                switch (input)
+                userValue = Validation.TrimLower(Console.ReadLine());
+                switch (userValue)
                 {
                     case "new":
                         AccountCreateUI.CreateScript(ourBank);
@@ -384,8 +489,8 @@ namespace RobMilesBank
                         AccountDeleteUI.DeleteScript(ourBank);
                         break;
                 }
-            } while (input != "exit");
-            ourBank.Save("Test.txt");
+            } while (userValue != "exit");
+            ourBank.Save("database.txt");
             Console.ReadLine();
         }
     }
