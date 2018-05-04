@@ -16,7 +16,7 @@ namespace AccountManagement
         }
         private decimal balance = 0;
         private string name;
-        private int accountNumber = UniqueAccountNumber();
+        private string accountNumber = UniqueAccountNumber();
         private static List<int> accountNumbers = new List<int>();
         public virtual bool WithdrawFunds(decimal amount)
         {
@@ -39,7 +39,7 @@ namespace AccountManagement
         {
             return name;
         }
-        public int GetAccountNumber()
+        public string GetAccountNumber()
         {
             return accountNumber;
         }
@@ -48,18 +48,20 @@ namespace AccountManagement
             this.name = inName.Trim();
             return true;
         }
-        public static int UniqueAccountNumber()
+        public static string UniqueAccountNumber()
         {
             Random rdn = new Random();
-            int accountNumber;
+            string accountNumber;
+            int intAccountNumber;
             while (true)
             {
-                accountNumber = rdn.Next(100000, 1000000);
-                if (accountNumbers.Contains(accountNumber))
+                accountNumber = rdn.Next(0, 1000000).ToString("000000");
+                intAccountNumber = int.Parse(accountNumber);
+                if (accountNumbers.Contains(intAccountNumber))
                 {
                     continue;
                 }
-                accountNumbers.Add(accountNumber);
+                accountNumbers.Add(intAccountNumber);
                 return accountNumber;
             }
 
@@ -132,7 +134,7 @@ namespace AccountManagement
         }
         public CustomerAccount(System.IO.TextReader textIn)
         {
-            accountNumber = int.Parse(textIn.ReadLine());
+            accountNumber = textIn.ReadLine();
             name = textIn.ReadLine();
             string balanceText = textIn.ReadLine();
             balance = decimal.Parse(balanceText);

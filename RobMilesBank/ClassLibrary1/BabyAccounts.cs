@@ -19,7 +19,7 @@ namespace AccountManagement
         {
             if (amount > maxWithdrawal)
             {
-                Console.WriteLine("There is a maximum of {0:C} on baby accounts.", maxWithdrawal);
+                Console.WriteLine("There is a maximum withdrawal of {0:C} on baby accounts.", maxWithdrawal);
                 return false;
             }
             return base.WithdrawFunds(amount);

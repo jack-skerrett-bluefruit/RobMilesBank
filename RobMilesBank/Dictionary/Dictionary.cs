@@ -22,9 +22,9 @@ namespace Dictionary
         }
         public bool StoreAccount(IAccount account)
         {
-            if (accountDictionary.ContainsKey(account.GetAccountNumber()) == true)
+            if (accountDictionary.ContainsKey(int.Parse(account.GetAccountNumber())) == true)
                 return false;
-            accountDictionary.Add(account.GetAccountNumber(), account);
+            accountDictionary.Add(int.Parse(account.GetAccountNumber()), account);
             return true;
         }
         public void DeleteAccount(int accountNumber)

@@ -9,7 +9,7 @@ namespace AccountManagement
         bool WithdrawFunds(decimal amount);
         decimal GetBalance();
         string GetName();
-        int GetAccountNumber();
+        string GetAccountNumber();
         bool SetName(string inName);
         bool Save(string filename);
         void Save(System.IO.TextWriter textOut);
