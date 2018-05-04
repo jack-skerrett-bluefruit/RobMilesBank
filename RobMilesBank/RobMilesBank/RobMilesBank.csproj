@@ -49,9 +49,21 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AccountUI\AccountUI.csproj">
+      <Project>{c20aaf12-f7cd-4a79-802d-c953e94250a2}</Project>
+      <Name>AccountUI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClassLibrary1\AccountManagement.csproj">
       <Project>{22a4ab6b-8a98-4162-a359-1341cd2d2d25}</Project>
       <Name>AccountManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dictionary\Dictionary.csproj">
+      <Project>{ddb2ac52-0962-40ac-bd57-6e0db8a2566c}</Project>
+      <Name>Dictionary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Validators\Validators.csproj">
+      <Project>{c90e8cfe-7923-4730-914f-b3c222dfa4c5}</Project>
+      <Name>Validators</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
