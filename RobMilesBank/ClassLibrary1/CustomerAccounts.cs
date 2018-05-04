@@ -1,23 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CustomerBanking
+
+namespace AccountManagement
+
 {
-    public interface IAccount
-    {
-        void PayInFunds(decimal amount);
-        bool WithdrawFunds(decimal amount);
-        decimal GetBalance();
-        string GetName();
-        int GetAccountNumber();
-        bool SetName(string inName);
-        bool Save(string filename);
-        void Save(System.IO.TextWriter textOut);
-        //bool SetParentName(string inParentName);
-    }
     public class CustomerAccount : IAccount
     {
         public CustomerAccount(
@@ -155,54 +142,6 @@ namespace CustomerBanking
             return "\nThe account number is " + accountNumber +
                 "\nThe account holders name is " + name +
                 "\nThe balance of this account is " + balance;
-        }
-    }
-    public class BabyAccount : CustomerAccount
-    {
-        private string parentName;
-        private int maxWithdrawal = 10;
-        public string GetParentName()
-        {
-            return parentName;
-        }
-        //public bool SetParentName(string inParentName)
-        //{
-        //    parentName = inParentName.Trim();
-        //    return true;
-        //}
-        public override bool WithdrawFunds(decimal amount)
-        {
-            if (amount > maxWithdrawal)
-            {
-                Console.WriteLine("There is a maximum of {0:C} on baby accounts.", maxWithdrawal);
-                return false;
-            }
-            return base.WithdrawFunds(amount);
-        }
-
-        public override void Save(System.IO.TextWriter textOut)
-        {
-            base.Save(textOut);
-            textOut.WriteLine(parentName);
-        }
-
-        public BabyAccount(
-            string newName,
-            decimal initialBalance,
-            string inParentName)
-            : base(newName, initialBalance)
-        {
-            parentName = inParentName;
-        }
-        public BabyAccount(System.IO.TextReader textIn) :
-            base(textIn)
-        {
-            parentName = textIn.ReadLine();
-        }
-        public override string ToString()
-        {
-            return base.ToString() +
-                "\nThe parent name is " + parentName;
         }
     }
 }
